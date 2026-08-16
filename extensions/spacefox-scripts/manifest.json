@@ -8,6 +8,11 @@
       "matches": ["<all_urls>"],
       "js": ["generated/crt-overlay.js"],
       "run_at": "document_start"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["spacefox-bridge.js", "osk-bridge.js", "spatial-nav.js"],
+      "run_at": "document_start"
     }
   ],
   "browser_specific_settings": {
