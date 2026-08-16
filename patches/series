@@ -1,0 +1,3 @@
+# One patch filename per line, applied in order by scripts/build.sh.
+# Empty for now -- branding-only fork until there's an actual behavior
+# patch to add (default prefs, UI tweaks, etc).
