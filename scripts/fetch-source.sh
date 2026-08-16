@@ -1,6 +1,4 @@
 #!/bin/sh
-# Downloads and extracts the Firefox release source tarball SpaceFox
-# tracks (see ../VERSION) into ../build/firefox-<version>/.
 set -eu
 cd "$(dirname "$0")/.."
 

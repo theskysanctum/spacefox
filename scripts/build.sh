@@ -1,8 +1,4 @@
 #!/bin/sh
-# Orchestrates fetch -> branding -> patches -> mach build. Not run by
-# anything automatically -- a real Firefox build is multi-hour and
-# needs several GB of toolchain (./mach bootstrap), so this is meant to
-# be run by hand.
 set -eu
 cd "$(dirname "$0")/.."
 

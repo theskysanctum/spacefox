@@ -1,9 +1,4 @@
 #!/bin/sh
-# Regenerates SpaceFox's theme from CosmOS's theme.py (see
-# theme/generate_userchrome.py) and installs it into a real Firefox
-# profile's chrome/ directory -- including flipping the pref that makes
-# Firefox load userChrome.css/userContent.css at all (off by default
-# upstream, since Firefox 69).
 set -eu
 cd "$(dirname "$0")/.."
 

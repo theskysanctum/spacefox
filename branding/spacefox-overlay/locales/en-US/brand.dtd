@@ -1,8 +1,3 @@
-<!-- Best-effort overlay: verify these entity names against whatever
-     Firefox's actual browser/branding/unofficial/locales/en-US/brand.dtd
-     looks like for the version SpaceFox is currently tracking (see
-     ../../../../VERSION) before a real build -- Firefox has changed this
-     file's exact shape across releases. -->
 <!ENTITY brandShorterName "SpaceFox">
 <!ENTITY brandShortName "SpaceFox">
 <!ENTITY brandFullName "SpaceFox">

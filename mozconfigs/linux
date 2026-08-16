@@ -2,12 +2,6 @@
 
 ac_add_options --enable-application=browser
 ac_add_options --with-branding=browser/branding/spacefox
-
-# Compiles in Firefox's EME plumbing (Widevine CDM support) -- same line
-# LibreWolf's own published mozconfig uses, for the same reason: without
-# it an unofficial build drops EME support entirely at compile time.
-# Whether the in-app Widevine CDM *download* itself also works on an
-# unofficial build is a separate, unconfirmed question -- see README.md.
 ac_add_options --enable-eme=widevine
 
 ac_add_options --disable-official-branding
