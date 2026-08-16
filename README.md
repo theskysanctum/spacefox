@@ -20,6 +20,33 @@ controller input and toward a pygame-side wrapper that can host/frame it,
 instead of everything living on the synthetic-input side. Not yet
 implemented -- currently branding-only, see `patches/series`.
 
+## Theming: matches CosmOS's own look, generated from its theme.py
+
+Rather than a static hand-written stylesheet, `theme/generate_userchrome.py`
+imports CosmOS's actual `userland/backend/theme.py` (the single source of
+truth for the console's own dark-background/neon-gradient palette, already
+used the same way by `userland/backend/web_upload.py`'s web portal) and
+generates a `userChrome.css`/`userContent.css` pair from its real values --
+`theme/generated/`, gitignored, regenerated on demand rather than committed,
+so it can never drift out of sync with CosmOS's palette. It also vendors in
+CosmOS's own three font weights (`fonts/{regular,light,bold}.ttf`) under the
+same `CosmOSFont` family name the web portal uses, so text renders in the
+same typeface CosmOS's own UI does. Currently reads as "CosmOS's own retro
+dark/neon console look carried over into Firefox's chrome" -- if "older"
+turns out to mean something more specific (a particular past Firefox UI
+era, actual skeuomorphic aging, etc.) once this is seen live, the generator
+is the one place to adjust, not scattered CSS.
+
+Applies only to Firefox's own UI (`userChrome.css`) and Firefox's own
+built-in pages like `about:*`/reader view/error pages (`userContent.css`)
+-- real websites' own CSS always wins on their own pages, same as any
+browser theme.
+
+Install into a real profile with `./scripts/install-userchrome.sh
+<profile-path>` -- also flips `toolkit.legacy.userProfileCustomizations.
+stylesheets` (off by default upstream since Firefox 69, required for
+`userChrome.css`/`userContent.css` to load at all).
+
 ## Why patch-based, not a full mozilla-central fork
 
 A full fork (cloning mozilla-unified) means owning tens of GB of history and
@@ -47,6 +74,10 @@ build, not a divergent codebase.
   order) for anything beyond branding -- default prefs, UI tweaks, etc.
   Empty for now; branding-only until there's an actual patch to add.
 - `mozconfigs/linux` -- the mozconfig passed to `./mach build`.
+- `theme/generate_userchrome.py` -- generates `theme/generated/` (CSS +
+  vendored fonts) from CosmOS's `theme.py`, see below.
+- `scripts/install-userchrome.sh` -- regenerates the theme and installs it
+  into a real Firefox profile's `chrome/` directory.
 - `scripts/build.sh` -- orchestrates fetch -> branding -> patches -> mach
   build. NOT run automatically by anything -- a full Firefox build is a
   multi-hour, multi-GB, toolchain-heavy operation (needs `./mach bootstrap`
