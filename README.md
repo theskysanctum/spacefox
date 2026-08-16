@@ -47,6 +47,34 @@ Install into a real profile with `./scripts/install-userchrome.sh
 stylesheets` (off by default upstream since Firefox 69, required for
 `userChrome.css`/`userContent.css` to load at all).
 
+The generated `userChrome.css` also sets which chrome survives: back/
+forward, the urlbar, and tabs stay (`#nav-bar`, `#TabsToolbar`); the
+bookmarks toolbar, the app/hamburger menu, and the extensions button are
+hidden (`#PersonalToolbar`, `#PanelUI-button`, `#unified-extensions-button`).
+Full chrome removal (Streaming: no UI at all, no way to escape back to raw
+Firefox) isn't built yet -- needs an Openbox window rule plus a content
+script intercepting escape-key combos, not just CSS.
+
+## Bundled extensions
+
+`extensions/bundle.json` lists AMO slugs (currently uBlock Origin,
+Dark Reader); `extensions/fetch_extensions.py` resolves each through
+Mozilla's real addon API (`addons.mozilla.org/api/v5/addons/addon/<slug>/`),
+downloads its current `.xpi`, and writes an `ExtensionSettings` policies.json
+force-installing them by their real extension IDs -- same enterprise-policy
+mechanism (`policies.json`'s `ExtensionSettings`/`force_installed`) LibreWolf
+and other Firefox forks already rely on for exactly this, works the same on
+an unofficial build.
+
+`install_url` in the generated policies.json points at
+`/usr/lib/spacefox/distribution/extensions/<id>.xpi` -- a placeholder for
+wherever SpaceFox actually ends up installed; not yet reconciled with how
+CosmOS's own Containerfile will eventually package SpaceFox. Update
+`INSTALL_DIR` in `extensions/fetch_extensions.py` once that's decided.
+
+`scripts/install-extensions.sh` re-fetches and drops the bundle + policy
+into a real build's output directory for local testing.
+
 ## Why patch-based, not a full mozilla-central fork
 
 A full fork (cloning mozilla-unified) means owning tens of GB of history and
@@ -78,6 +106,10 @@ build, not a divergent codebase.
   vendored fonts) from CosmOS's `theme.py`, see below.
 - `scripts/install-userchrome.sh` -- regenerates the theme and installs it
   into a real Firefox profile's `chrome/` directory.
+- `extensions/bundle.json` / `extensions/fetch_extensions.py` -- the
+  force-installed extension bundle (uBlock Origin, Dark Reader), see below.
+- `scripts/install-extensions.sh` -- fetches the bundle and installs it into
+  a real build's output directory.
 - `scripts/build.sh` -- orchestrates fetch -> branding -> patches -> mach
   build. NOT run automatically by anything -- a full Firefox build is a
   multi-hour, multi-GB, toolchain-heavy operation (needs `./mach bootstrap`

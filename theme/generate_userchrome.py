@@ -60,11 +60,16 @@ def main():
 
 #navigator-toolbox,
 #TabsToolbar,
-#nav-bar,
-#PersonalToolbar {{
+#nav-bar {{
   background: var(--cosmos-bg) !important;
   color: var(--cosmos-text) !important;
   border-color: var(--cosmos-fg-dim) !important;
+}}
+
+#PersonalToolbar,
+#PanelUI-button,
+#unified-extensions-button {{
+  display: none !important;
 }}
 
 .tab-background {{
