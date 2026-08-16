@@ -1,4 +1,19 @@
-# SpaceFox
+# SpaceFox (retired)
+
+Retired in favor of Spacecadet (WebKitGTK + a native userscript engine via
+`WebKitUserContentManager`, instead of forking Firefox and fighting its
+extension-install pipeline).
+Root cause: `policies.json`'s `ExtensionSettings` force-install -- the
+whole plan for shipping SpaceFox's controller-nav/OSK/CRT-overlay
+WebExtension without user interaction -- was verified live to silently
+not work (`about:policies` showed it "Active", but no install was ever
+attempted; same result for the plain `distribution/extensions/<id>.xpi`
+drop-in). WebKitGTK sidesteps this entirely: userscript injection is a
+first-class embedding API, not something bolted on through browser
+extension infrastructure. Kept here, archived, for the branding/theming
+work in case any of it is reusable later -- not under active development.
+
+---
 
 A patch-based Firefox rebrand, in the same shape as LibreWolf/Waterfox: no
 full Gecko source fork, no maintained divergent history. Instead, `scripts/`
