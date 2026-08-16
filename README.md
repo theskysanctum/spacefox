@@ -134,7 +134,10 @@ CosmOS-side integration change.
 
 ## Controller navigation + OSK
 
-Real, working, verified end to end (not just design) as of this writing:
+Real, working, verified end to end in an actual running Firefox (not just
+Python-side, not just design) as of this writing -- see "Live-tested
+findings" below for exactly what was checked and one real deployment
+problem this surfaced.
 
 - **`userland/backend/osk_bridge.py`** (in the CosmOS repo) -- a local
   WebSocket server (`127.0.0.1:8756`) `gamebox.py` starts once at init.
@@ -174,6 +177,37 @@ real, standard privacy-fingerprinting mitigation browsers implement), so
 spatial nav wouldn't be available immediately on page load. Keeping
 `gamebox.py` as the single owner of raw controller reads, same as every
 other CosmOS input path, avoids that.
+
+### Live-tested findings
+
+Actually loaded into a real, unmodified system Firefox (temporarily, for
+testing only) and driven end to end against the real `osk_bridge.py`
+server -- not just read for syntax. Confirmed live:
+
+- The CRT overlay actually renders, visibly, on a real page.
+- The extension's WebSocket actually connects to `osk_bridge.py` and
+  survives/reconnects when the server restarts.
+- Clicking into and out of a real `<input>` sent real `{"action":"show"}`/
+  `{"action":"hide"}` messages, received by the real server.
+- Sending real `{"action":"nav","direction":"down"}` messages from the
+  server moved real DOM focus, in order, exactly as the algorithm
+  predicts (`link1` -> `textbox` -> `btn1`).
+
+One real problem this surfaced: **force-installing via `policies.json`
+did not actually work** on this machine's Firefox, even though
+`about:policies` showed the policy as "Active" -- `about:addons`/
+`about:debugging` showed no extension ever got installed, and
+`extensions.json` had no record of an install attempt. The policy engine
+read and parsed the config correctly; something in `ExtensionSettings`
+force-install processing for a local unsigned `file://` `install_url`
+silently didn't follow through, on this Firefox build at least. Loading
+the exact same `extensions/spacefox-scripts/manifest.json` as a temporary
+add-on via `about:debugging` worked immediately and is what all the
+findings above are based on. This needs real investigation before relying
+on the force-install path for CosmOS's actual deployment -- possible
+causes not yet ruled out: a Fedora-packaging-specific quirk, a Firefox
+version difference, or a genuine gap in how `install_url` handles local
+files that AMO-hosted URLs don't hit.
 
 **Not yet done:** none of this differentiates Browser vs. Streaming mode,
 or handles the "Streaming: no way to escape" lockdown -- that's still an
