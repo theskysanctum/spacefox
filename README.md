@@ -58,7 +58,7 @@ script intercepting escape-key combos, not just CSS.
 ## Bundled extensions
 
 `extensions/bundle.json` lists AMO slugs (currently uBlock Origin,
-Dark Reader); `extensions/fetch_extensions.py` resolves each through
+Dark Reader, Violentmonkey); `extensions/fetch_extensions.py` resolves each through
 Mozilla's real addon API (`addons.mozilla.org/api/v5/addons/addon/<slug>/`),
 downloads its current `.xpi`, and writes an `ExtensionSettings` policies.json
 force-installing them by their real extension IDs -- same enterprise-policy
@@ -74,6 +74,39 @@ CosmOS's own Containerfile will eventually package SpaceFox. Update
 
 `scripts/install-extensions.sh` re-fetches and drops the bundle + policy
 into a real build's output directory for local testing.
+
+## Userscripts
+
+Page-level behavior (the CRT/scanline overlay, and eventually spatial nav +
+the OSK bridge) is built as Violentmonkey-format userscripts rather than
+patches or a hand-rolled WebExtension: a content-script-only concern with no
+need for a persistent background page, since SpaceFox is a single-window
+kiosk browser -- only one page is ever meaningfully active at a time, so
+each page opening its own connection when it needs something (like the OSK)
+is simpler than coordinating a shared one.
+
+`userscripts/generate_crt_overlay.py` reads CosmOS's real
+`backend/screen_profiles.py` (`MEDIA_SCANLINES`, the same profile
+`gamebox.py` already applies to Browser/Streaming today via the X11-level
+`crt_overlay.py`) and renders a tiny tileable PNG through ImageMagick,
+base64-embedded into `userscripts/generated/crt-overlay.user.js` from
+`userscripts/crt-overlay.template.js`. Runs entirely in-page (a fixed,
+`pointer-events: none` div), so it can never cover Firefox's own chrome by
+construction -- unlike the X11 overlay, no window-geometry coordination
+needed. `gamebox.py`'s `crt_overlay_backend.show("browser"/"streaming", ...)`
+calls should eventually stop firing once this replaces them for SpaceFox
+specifically; not done yet, that's a CosmOS-side integration change.
+
+**Not yet wired up:** force-installing Violentmonkey via `policies.json`
+gets the extension installed, but doesn't make it load our script --
+Violentmonkey normally adds scripts through its own UI (visit a raw
+`.user.js` URL, click install) or by pre-seeding its internal storage,
+which is fragile/version-dependent and not worth hand-rolling. Needs either
+a first-boot install step, or -- probably cleaner -- wrapping our own
+scripts as their own small force-installed WebExtension (`content_scripts`
+matching `<all_urls>`, no UI) the same way as uBlock Origin/Dark Reader, and
+keeping Violentmonkey around only for future GreasyFork scripts a user adds
+themselves.
 
 ## Why patch-based, not a full mozilla-central fork
 
@@ -110,6 +143,8 @@ build, not a divergent codebase.
   force-installed extension bundle (uBlock Origin, Dark Reader), see below.
 - `scripts/install-extensions.sh` -- fetches the bundle and installs it into
   a real build's output directory.
+- `userscripts/generate_crt_overlay.py` / `userscripts/crt-overlay.template.js`
+  -- generates `userscripts/generated/crt-overlay.user.js`, see below.
 - `scripts/build.sh` -- orchestrates fetch -> branding -> patches -> mach
   build. NOT run automatically by anything -- a full Firefox build is a
   multi-hour, multi-GB, toolchain-heavy operation (needs `./mach bootstrap`

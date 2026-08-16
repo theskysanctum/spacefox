@@ -1,4 +1,5 @@
 [
   { "slug": "ublock-origin" },
-  { "slug": "darkreader" }
+  { "slug": "darkreader" },
+  { "slug": "violentmonkey" }
 ]
