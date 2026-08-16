@@ -1,4 +1,5 @@
 build/
 theme/generated/
 extensions/generated/
+extensions/spacefox-scripts/generated/
 userscripts/generated/

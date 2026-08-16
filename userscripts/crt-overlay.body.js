@@ -1,11 +1,3 @@
-// ==UserScript==
-// @name         SpaceFox CRT Overlay
-// @namespace    https://github.com/theskysanctum/spacefox
-// @version      1.0
-// @match        *://*/*
-// @grant        none
-// @run-at       document-start
-// ==/UserScript==
 (function () {
   'use strict';
   const TILE_DATA_URI = "__CRT_TILE_DATA_URI__";
